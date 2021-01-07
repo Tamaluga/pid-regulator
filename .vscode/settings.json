@@ -1,0 +1,15 @@
+{
+    "files.autoSave":"onFocusChange",
+
+    "cmake.configureOnOpen": true,
+    "cmake.buildDirectory": "${workspaceFolder}/build",
+    "cmake.sourceDirectory": "${workspaceFolder}/tests/native",
+    "cmake.generator": "Ninja",
+    "cmake.loggingLevel":"info",
+    "cmake.parallelJobs": 4,
+    "cmake.saveBeforeBuild":true,
+
+    "git.ignoreLimitWarning": true,
+
+    "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+}
