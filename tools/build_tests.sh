@@ -9,7 +9,7 @@ SCRIPTDIR=$(dirname "$SCRIPT")
 BASEDIR=$(dirname "$SCRIPTDIR")
 
 # If you want to build into a different directory, change this variable
-SOURCEDIR="$BASEDIR/tests/native"
+SOURCEDIR="$BASEDIR"
 BUILDDIR="$BASEDIR/build/"
 
 # Generate the build system using Ninja

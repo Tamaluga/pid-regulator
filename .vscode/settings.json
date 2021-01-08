@@ -3,7 +3,7 @@
 
     "cmake.configureOnOpen": true,
     "cmake.buildDirectory": "${workspaceFolder}/build",
-    "cmake.sourceDirectory": "${workspaceFolder}/tests/native",
+    "cmake.sourceDirectory": "${workspaceFolder}",
     "cmake.generator": "Ninja",
     "cmake.loggingLevel":"info",
     "cmake.parallelJobs": 4,

@@ -1,9 +1,7 @@
-# App
-
 cmake_minimum_required(VERSION 3.16 FATAL_ERROR)
 
 # Create CMake project
-set(PROJECT "pi-regulator_native")
+set(PROJECT "regulator_autotune")
 project(${PROJECT} VERSION 1.0.0 LANGUAGES C ASM)
 
 # Set Language Standards

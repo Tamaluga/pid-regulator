@@ -5,20 +5,19 @@
 /*! \file Regulator.h
 /******************************************************************************/
 
-struct RegulatorParam
-{
-	float xKp;				// Proportional factor
-	float xKi;				// Integration factor
-	float xUpdateFrequency;	// Regulation frequency
-	float xReference;		// Setpoint
-	float xTolerance;		// Setpoint Tolerance
-	float xMinSystemInput;	// Minimal value for actuating variable
-	float xMaxSystemInput;	// Maximal value for actuating variable
-};
-
-/*Sets the the paramenter needed by the regulator parameters for the regulation*/
-extern void vRegSetParam(const struct RegulatorParam xRegulatorParam);
+/*Setters for controller paramenters*/
+extern void RegulatorSetRegFactors(const float kp, const float ki, const float kd);
+extern void RegulatorSetUpdateInterval(const unsigned long updateInterval_us);
+extern void RegulatorSetReference(const float reference);
+extern void RegulatorSetTolerance(const float tolerance);
+extern void RegulatorSetMinMaxSystemInput(float minSystemInput, float maxSystemInput);
+/*Getters for controller paramenters*/
+extern float RegulatorGetKp();
+extern float RegulatorGetKi();
+extern float RegulatorGetKd();
+extern float RegulatorGetReference();
+extern unsigned long RegulatorGetUpdateInterval();
 /*Must be called due to the parametrized frequency resp. interval*/
-extern void vRegRegulate(const float xSystemOutput, float* xSystemInput);
+extern void RegulatorRegulate(const float systemOutput, float* systemInput);
 
 #endif /* __REGULATOR_H_ */

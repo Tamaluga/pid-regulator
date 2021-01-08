@@ -9,52 +9,113 @@
 
 /* ------------------------- module data declaration -------------------------*/
 
-static struct RegulatorParam xMyRegulatorParam;
+float g_Kp = 0.0;		  		// Proportional factor
+float g_Ki = 0.0;				// Integration factor
+float g_Kd = 0.0;				// Differential factor
+float g_UpdateInterval_us = 0.0;// Regulation interval
+float g_Reference = 0.0;		// Setpoint
+float g_Tolerance = 0.0;		// Setpoint Tolerance
+float g_MinSystemInput = 0.0;	// Minimal value for actuating variable
+float g_MaxSystemInput = 0.0;	// Maximal value for actuating variable
+
+float g_E = 0.0;	 	// measured error
+float g_ESum = 0.0; 	// error sum
+float g_EOld = 0.0; 	// error sum
+float g_YP = 0.0;	 	// Proportional system input
+float g_YI = 0.0;	 	// Integral system input
+float g_YD = 0.0;	 	// Differential system input
+float g_Y = 0.0;	 	// Sum of yP and yI -> actual system input
 
 /* ----------------------- module procedure declaration ----------------------*/
 
-void vRegSetParam(const struct RegulatorParam xRegulatorParam)
+void RegulatorSetRegFactors(const float kp, const float ki, const float kd)
 {
-	assert(xRegulatorParam.xKp > 0.0);
-	assert(xRegulatorParam.xKi > 0.0);
-	assert(xRegulatorParam.xUpdateFrequency > 0.0);
-	assert(xRegulatorParam.xTolerance > 0.0);
-	assert(xRegulatorParam.xMinSystemInput < xRegulatorParam.xMaxSystemInput);
-	xMyRegulatorParam = xRegulatorParam;
+	g_Kp = kp;
+	g_Ki = ki;
+	g_Kd = kd;
 }
 
-void vRegRegulate(const float xSystemOutput, float* xSystemInput)
+void RegulatorSetUpdateInterval(const unsigned long updateInterval_us)
 {
-	static float e = 0;		// error
-	static float e_sum = 0; // error sum
-	static float yP = 0;    // Proportional system input
-	static float yI = 0;    // Integral system input
-	static float y = 0;     // System input
+	assert(updateInterval_us > 0.0);
+	g_UpdateInterval_us = updateInterval_us;
+}
 
+void RegulatorSetReference(const float reference)
+{
+	g_Reference = reference;
+}
+
+void RegulatorSetTolerance(const float tolerance)
+{
+	assert(tolerance > 0.0);
+	g_Tolerance = tolerance;
+}
+
+void RegulatorSetMinMaxSystemInput(float minSystemInput, float maxSystemInput)
+{
+	assert(minSystemInput < maxSystemInput);
+	g_MinSystemInput = minSystemInput;
+	g_MaxSystemInput = maxSystemInput;
+}
+
+float RegulatorGetKp()
+{
+	return g_Kp;
+}
+
+float RegulatorGetKi()
+{
+	return g_Ki;
+}
+
+float RegulatorGetKd()
+{
+	return g_Kd;
+}
+
+extern float RegulatorGetReference()
+{
+	return g_Reference;
+}
+
+extern unsigned long RegulatorGetUpdateInterval()
+{
+	return g_UpdateInterval_us;
+}
+
+void RegulatorRegulate(const float systemOutput, float *systemInput)
+{
 	// Calculate error
-	e = xMyRegulatorParam.xReference - xSystemOutput;
+	g_E = g_Reference - systemOutput;
 
 	// Set error to zero if its in the tolerance
-	if (fabs(e) < xMyRegulatorParam.xTolerance)
+	if (fabs(g_E) < g_Tolerance)
 	{
-		e = 0;
+		g_E = 0;
 	}
 
 	// Proof oversteering of the control output (Anti-Windup)
-	if ((y < xMyRegulatorParam.xMaxSystemInput) || (y > xMyRegulatorParam.xMinSystemInput))
+	if ((g_Y < g_MaxSystemInput) || (g_Y > g_MinSystemInput))
 	{
-		e_sum += e;
+		g_ESum += g_E;
 	}
 
 	// Proportional part
-	yP = e * xMyRegulatorParam.xKp;
+	g_YP = g_E * g_Kp;
 
 	// Integral part
-	yI = xMyRegulatorParam.xKi * e_sum / xMyRegulatorParam.xUpdateFrequency;
+	g_YI = g_Ki * g_ESum * (g_UpdateInterval_us * 0.000001);
+
+	// Differential part
+	g_YD = g_Kd * (g_E - g_EOld) / (g_UpdateInterval_us * 0.000001);
 
 	// Total error
-	y = yP + yI;
+	g_Y = g_YP + g_YI;
 
 	// Set input value
-	*xSystemInput = y;
+	*systemInput = g_Y;
+
+	// Save error to previous error
+	g_EOld = g_E;
 }
